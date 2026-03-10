@@ -1,0 +1,656 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Central de Suporte — smrtcomp</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand-primary:   #4D6072;
+      --brand-accent:    #F26522;
+      --brand-light:     #FEF0E7;
+      --success:         #16a34a;
+      --danger:          #dc2626;
+      --warning:         #d97706;
+      --gray-50:         #f9fafb;
+      --gray-100:        #f3f4f6;
+      --gray-200:        #e5e7eb;
+      --gray-400:        #9ca3af;
+      --gray-600:        #4b5563;
+      --gray-800:        #1f2937;
+      --radius:          10px;
+      --shadow:          0 4px 20px rgba(0,0,0,.10);
+      --transition:      .2s ease;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-800);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    /* ── Header ── */
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .header .logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: .75rem;
+    }
+    .header p {
+      color: var(--gray-600);
+      font-size: .95rem;
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+    }
+
+    /* ── Section titles ── */
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--brand-accent);
+      margin-bottom: 1.2rem;
+      padding-bottom: .5rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .section-title svg { flex-shrink: 0; }
+    .section + .section { margin-top: 2rem; }
+
+    /* ── Grid / Fields ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .field { display: flex; flex-direction: column; gap: .35rem; }
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--gray-600);
+    }
+    label .req { color: var(--danger); margin-left: 2px; }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    select,
+    textarea {
+      width: 100%;
+      padding: .65rem .85rem;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 7px;
+      font-size: .93rem;
+      color: var(--gray-800);
+      background: #fff;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      outline: none;
+      font-family: inherit;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--brand-accent);
+      box-shadow: 0 0 0 3px rgba(242,101,34,.15);
+    }
+    textarea { resize: vertical; min-height: 120px; }
+    select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239ca3af' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right .85rem center; }
+
+    /* ── Type selector ── */
+    .type-group { display: flex; gap: .75rem; flex-wrap: wrap; }
+    .type-option { flex: 1; min-width: 150px; }
+    .type-option input[type="radio"] { display: none; }
+    .type-option label {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .75rem 1rem;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+      font-size: .88rem;
+      font-weight: 600;
+      color: var(--gray-600);
+    }
+    .type-option label .icon { font-size: 1.3rem; }
+    .type-option input[type="radio"]:checked + label {
+      border-color: var(--brand-accent);
+      background: var(--brand-light);
+      color: var(--brand-primary);
+    }
+
+    /* ── Priority ── */
+    .priority-group { display: flex; gap: .6rem; }
+    .priority-option input[type="radio"] { display: none; }
+    .priority-option label {
+      padding: .4rem .9rem;
+      border-radius: 20px;
+      border: 1.5px solid var(--gray-200);
+      cursor: pointer;
+      font-size: .82rem;
+      font-weight: 600;
+      transition: all var(--transition);
+    }
+    .priority-option.low input:checked + label   { background: #dcfce7; border-color: var(--success); color: var(--success); }
+    .priority-option.med input:checked + label   { background: #fef3c7; border-color: var(--warning); color: var(--warning); }
+    .priority-option.high input:checked + label  { background: #fee2e2; border-color: var(--danger);  color: var(--danger);  }
+
+    /* ── Dropzone ── */
+    .dropzone {
+      border: 2px dashed var(--gray-200);
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+      position: relative;
+    }
+    .dropzone.dragover {
+      border-color: var(--brand-accent);
+      background: var(--brand-light);
+    }
+    .dropzone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .dropzone .dz-icon { font-size: 2rem; margin-bottom: .4rem; }
+    .dropzone .dz-text { font-size: .88rem; color: var(--gray-600); line-height: 1.5; }
+    .dropzone .dz-text strong { color: var(--brand-accent); }
+    .dropzone .dz-hint { font-size: .78rem; color: var(--gray-400); margin-top: .25rem; }
+
+    /* ── Preview thumbnails ── */
+    .preview-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem;
+      margin-top: .75rem;
+    }
+    .preview-item {
+      position: relative;
+      width: 80px; height: 80px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1.5px solid var(--gray-200);
+    }
+    .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+    .preview-item .remove-btn {
+      position: absolute;
+      top: 2px; right: 2px;
+      width: 20px; height: 20px;
+      background: rgba(0,0,0,.6);
+      border-radius: 50%;
+      border: none;
+      color: #fff;
+      font-size: .7rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1;
+    }
+    .preview-item .file-icon {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: var(--gray-100);
+      font-size: .6rem;
+      color: var(--gray-600);
+      text-align: center;
+      padding: .3rem;
+      word-break: break-all;
+    }
+    .preview-item .file-icon span { font-size: 1.4rem; margin-bottom: .2rem; }
+
+    /* ── Submit ── */
+    .submit-row {
+      margin-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .75rem;
+    }
+    .btn-submit {
+      width: 100%;
+      max-width: 360px;
+      padding: .9rem 2rem;
+      background: var(--brand-primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition);
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
+    }
+    .btn-submit:hover  { background: var(--brand-accent); transform: translateY(-1px); }
+    .btn-submit:active { transform: translateY(0); }
+    .btn-submit:disabled { opacity: .65; cursor: not-allowed; transform: none; }
+    .submit-note { font-size: .78rem; color: var(--gray-400); text-align: center; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem; right: 1.5rem;
+      padding: 1rem 1.4rem;
+      border-radius: 10px;
+      font-size: .9rem;
+      font-weight: 600;
+      color: #fff;
+      max-width: 340px;
+      box-shadow: 0 6px 24px rgba(0,0,0,.2);
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all .3s ease;
+      z-index: 999;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: var(--success); }
+    .toast.error   { background: var(--danger); }
+
+    /* ── Success screen ── */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+    .success-screen.visible { display: block; }
+    .success-icon { font-size: 4rem; margin-bottom: 1rem; }
+    .success-screen h2 { font-size: 1.5rem; color: var(--brand-primary); margin-bottom: .5rem; }
+    .success-screen p  { color: var(--gray-600); font-size: .95rem; line-height: 1.6; max-width: 400px; margin: 0 auto 1.5rem; }
+    .btn-new {
+      padding: .7rem 1.6rem;
+      background: var(--brand-primary);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      font-size: .93rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+    .btn-new:hover { background: var(--brand-accent); }
+
+    /* ── Responsive ── */
+    @media (max-width: 560px) {
+      .card { padding: 1.5rem 1rem; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .type-group { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-wrap">
+      <img src="logo.png" alt="smrtcomp – Pay System" style="height:56px;width:auto;" />
+    </div>
+    <p>Central de Suporte — envie suas dúvidas e reporte problemas do sistema para nossa equipe.</p>
+  </div>
+
+  <!-- Card -->
+  <div class="card">
+
+    <!-- Success screen (hidden by default) -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">✅</div>
+      <h2>Chamado enviado com sucesso!</h2>
+      <p>Nossa equipe recebeu sua solicitação e entrará em contato em breve. Verifique seu e-mail para a confirmação.</p>
+      <button class="btn-new" onclick="resetForm()">Abrir novo chamado</button>
+    </div>
+
+    <!-- Form -->
+    <form id="supportForm" novalidate>
+      <!-- Formsubmit hidden config -->
+      <input type="hidden" name="_subject"     value="[smrtcomp] Novo chamado de suporte" />
+      <input type="hidden" name="_cc"          value="isa.ferraz@how2pay.com.br" />
+      <input type="hidden" name="_template"    value="table" />
+      <input type="hidden" name="_captcha"     value="false" />
+      <input type="hidden" name="_next"        value="" />
+      <!-- bot trap -->
+      <input type="text"   name="_honey"       style="display:none" />
+
+      <!-- 1. Identificação -->
+      <div class="section">
+        <div class="section-title">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          Identificação
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="nome">Nome completo <span class="req">*</span></label>
+            <input type="text" id="nome" name="Nome" placeholder="Seu nome" required />
+          </div>
+          <div class="field">
+            <label for="empresa">Empresa <span class="req">*</span></label>
+            <input type="text" id="empresa" name="Empresa" placeholder="Nome da sua empresa" required />
+          </div>
+          <div class="field">
+            <label for="email">E-mail <span class="req">*</span></label>
+            <input type="email" id="email" name="E-mail" placeholder="seu@email.com" required />
+          </div>
+          <div class="field">
+            <label for="telefone">Telefone / WhatsApp</label>
+            <input type="tel" id="telefone" name="Telefone" placeholder="(11) 9 0000-0000" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Tipo de solicitação -->
+      <div class="section">
+        <div class="section-title">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>
+          Tipo de solicitação
+        </div>
+        <div class="type-group">
+          <div class="type-option">
+            <input type="radio" id="tipo_bug" name="Tipo" value="Bug / Erro no sistema" required />
+            <label for="tipo_bug">
+              <span class="icon">🐛</span>
+              <span>Bug / Erro no sistema</span>
+            </label>
+          </div>
+          <div class="type-option">
+            <input type="radio" id="tipo_duvida" name="Tipo" value="Dúvida de utilização" />
+            <label for="tipo_duvida">
+              <span class="icon">💬</span>
+              <span>Dúvida de utilização</span>
+            </label>
+          </div>
+          <div class="type-option">
+            <input type="radio" id="tipo_melhoria" name="Tipo" value="Sugestão de melhoria" />
+            <label for="tipo_melhoria">
+              <span class="icon">💡</span>
+              <span>Sugestão de melhoria</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Descrição -->
+      <div class="section">
+        <div class="section-title">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          Descrição
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="modulo">Módulo / área do sistema</label>
+            <select id="modulo" name="Módulo">
+              <option value="">Selecione (opcional)</option>
+              <option>Seus Dados</option>
+              <option>Estrutura de Cargos</option>
+              <option>Estratégia de Remuneração</option>
+              <option>Dashboard de Remuneração</option>
+              <option>Meritocracia</option>
+              <option>Central de Upload</option>
+              <option>Controle de Acesso</option>
+              <option>Outro</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Prioridade <span class="req">*</span></label>
+            <div class="priority-group">
+              <div class="priority-option low">
+                <input type="radio" id="prio_low" name="Prioridade" value="Baixa" required />
+                <label for="prio_low">Baixa</label>
+              </div>
+              <div class="priority-option med">
+                <input type="radio" id="prio_med" name="Prioridade" value="Média" />
+                <label for="prio_med">Média</label>
+              </div>
+              <div class="priority-option high">
+                <input type="radio" id="prio_high" name="Prioridade" value="Alta" />
+                <label for="prio_high">Alta</label>
+              </div>
+            </div>
+          </div>
+          <div class="field full">
+            <label for="descricao">Descrição detalhada <span class="req">*</span></label>
+            <textarea id="descricao" name="Descrição" placeholder="Descreva com o máximo de detalhes possível: o que você estava fazendo, o que aconteceu, qual era o resultado esperado..." required></textarea>
+          </div>
+          <div class="field full">
+            <label for="passos">Passos para reproduzir o problema <small style="font-weight:400;color:var(--gray-400)">(se aplicável)</small></label>
+            <textarea id="passos" name="Passos para reprodução" placeholder="Ex: 1. Acessei o menu X  2. Cliquei em Y  3. O sistema exibiu..." style="min-height:80px"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Anexos -->
+      <div class="section">
+        <div class="section-title">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+          Anexos (prints de tela)
+        </div>
+        <div class="dropzone" id="dropzone">
+          <input type="file" id="fileInput" multiple accept="image/*,.pdf" />
+          <div class="dz-icon">📎</div>
+          <div class="dz-text"><strong>Clique para selecionar</strong> ou arraste os arquivos aqui</div>
+          <div class="dz-hint">Imagens (PNG, JPG, GIF) e PDF — máx. 5 arquivos, 5 MB cada</div>
+        </div>
+        <div class="preview-grid" id="previewGrid"></div>
+        <!-- hidden base64 fields will be injected here by JS -->
+        <div id="base64Fields"></div>
+      </div>
+
+      <!-- Submit -->
+      <div class="submit-row">
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+          Enviar chamado
+        </button>
+        <p class="submit-note">Ao enviar, nossa equipe receberá uma notificação e entrará em contato pelo e-mail informado.</p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <p style="text-align:center;margin-top:1.5rem;font-size:.78rem;color:var(--gray-400)">
+    © 2025 How2Pay Consultoria · smrtcomp · <a href="https://smrtcomp.com/" target="_blank" style="color:var(--brand-accent);text-decoration:none">smrtcomp.com</a>
+  </p>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  /* ── Config ─────────────────────────────────────────── */
+  const FORM_ACTION = 'https://formsubmit.co/fernanda.abilel@how2pay.com.br';
+  const MAX_FILES   = 5;
+  const MAX_SIZE_MB = 5;
+
+  /* ── State ───────────────────────────────────────────── */
+  const selectedFiles = []; // { file, dataUrl }
+
+  /* ── Elements ────────────────────────────────────────── */
+  const form        = document.getElementById('supportForm');
+  const dropzone    = document.getElementById('dropzone');
+  const fileInput   = document.getElementById('fileInput');
+  const previewGrid = document.getElementById('previewGrid');
+  const base64Div   = document.getElementById('base64Fields');
+  const submitBtn   = document.getElementById('submitBtn');
+  const toastEl     = document.getElementById('toast');
+  const successScr  = document.getElementById('successScreen');
+
+  /* ── Toast ───────────────────────────────────────────── */
+  let toastTimer;
+  function showToast(msg, type = 'success') {
+    clearTimeout(toastTimer);
+    toastEl.textContent = msg;
+    toastEl.className   = `toast ${type} show`;
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 4000);
+  }
+
+  /* ── Drag & drop ─────────────────────────────────────── */
+  dropzone.addEventListener('dragover',  e => { e.preventDefault(); dropzone.classList.add('dragover'); });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    handleFiles(Array.from(e.dataTransfer.files));
+  });
+  fileInput.addEventListener('change', () => {
+    handleFiles(Array.from(fileInput.files));
+    fileInput.value = '';
+  });
+
+  function handleFiles(files) {
+    for (const f of files) {
+      if (selectedFiles.length >= MAX_FILES) {
+        showToast(`Limite de ${MAX_FILES} arquivos atingido.`, 'error'); break;
+      }
+      if (f.size > MAX_SIZE_MB * 1024 * 1024) {
+        showToast(`"${f.name}" excede ${MAX_SIZE_MB} MB.`, 'error'); continue;
+      }
+      if (selectedFiles.find(x => x.file.name === f.name && x.file.size === f.size)) continue;
+
+      const reader = new FileReader();
+      reader.onload = e => {
+        const entry = { file: f, dataUrl: e.target.result };
+        selectedFiles.push(entry);
+        renderPreviews();
+      };
+      reader.readAsDataURL(f);
+    }
+  }
+
+  function renderPreviews() {
+    previewGrid.innerHTML = '';
+    base64Div.innerHTML   = '';
+
+    selectedFiles.forEach((entry, i) => {
+      const item = document.createElement('div');
+      item.className = 'preview-item';
+
+      if (entry.file.type.startsWith('image/')) {
+        const img = document.createElement('img');
+        img.src = entry.dataUrl;
+        item.appendChild(img);
+      } else {
+        const ico = document.createElement('div');
+        ico.className = 'file-icon';
+        ico.innerHTML = `<span>📄</span>${entry.file.name}`;
+        item.appendChild(ico);
+      }
+
+      const btn = document.createElement('button');
+      btn.type      = 'button';
+      btn.className = 'remove-btn';
+      btn.innerHTML = '✕';
+      btn.title     = 'Remover';
+      btn.addEventListener('click', () => { selectedFiles.splice(i, 1); renderPreviews(); });
+      item.appendChild(btn);
+      previewGrid.appendChild(item);
+
+      /* hidden field to include in email body */
+      const hidden = document.createElement('input');
+      hidden.type  = 'hidden';
+      hidden.name  = `Anexo_${i + 1}_nome`;
+      hidden.value = entry.file.name;
+      base64Div.appendChild(hidden);
+    });
+  }
+
+  /* ── Validation ──────────────────────────────────────── */
+  function validate() {
+    const required = [
+      { el: form.querySelector('#nome'),      msg: 'Informe seu nome.' },
+      { el: form.querySelector('#empresa'),   msg: 'Informe sua empresa.' },
+      { el: form.querySelector('#email'),     msg: 'Informe um e-mail válido.' },
+      { el: form.querySelector('#descricao'), msg: 'Descreva o problema ou dúvida.' },
+    ];
+    for (const { el, msg } of required) {
+      if (!el.value.trim()) { el.focus(); showToast(msg, 'error'); return false; }
+    }
+    if (!form.querySelector('[name="Tipo"]:checked')) {
+      showToast('Selecione o tipo de solicitação.', 'error'); return false;
+    }
+    if (!form.querySelector('[name="Prioridade"]:checked')) {
+      showToast('Selecione a prioridade.', 'error'); return false;
+    }
+    const email = form.querySelector('#email').value;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      form.querySelector('#email').focus();
+      showToast('Informe um e-mail válido.', 'error'); return false;
+    }
+    return true;
+  }
+
+  /* ── Submit ──────────────────────────────────────────── */
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83"/></svg> Enviando...`;
+
+    /* Build FormData */
+    const fd = new FormData(form);
+
+    /* Add submitter email to CC so they receive a copy */
+    const submitterEmail = form.querySelector('#email').value.trim();
+    fd.set('_cc', `isa.ferraz@how2pay.com.br,${submitterEmail}`);
+
+    /* Attach actual files */
+    selectedFiles.forEach((entry, i) => {
+      fd.append(`attachment_${i + 1}`, entry.file, entry.file.name);
+    });
+
+    /* Remove base64 fields (they're just labels) */
+    /* FormSubmit receives real files via multipart */
+
+    try {
+      const resp = await fetch(FORM_ACTION, { method: 'POST', body: fd, headers: { Accept: 'application/json' } });
+
+      if (resp.ok) {
+        form.style.display    = 'none';
+        successScr.classList.add('visible');
+      } else {
+        throw new Error('Resposta não-ok: ' + resp.status);
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Erro ao enviar. Tente novamente ou contate o suporte.', 'error');
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg> Enviar chamado`;
+    }
+  });
+
+  /* ── Reset ───────────────────────────────────────────── */
+  window.resetForm = function () {
+    form.reset();
+    selectedFiles.length = 0;
+    renderPreviews();
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = `<svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg> Enviar chamado`;
+    form.style.display = '';
+    successScr.classList.remove('visible');
+  };
+
+  /* ── Spinner style ───────────────────────────────────── */
+  const style = document.createElement('style');
+  style.textContent = `@keyframes spin{to{transform:rotate(360deg)}}.spin{animation:spin .8s linear infinite}`;
+  document.head.appendChild(style);
+})();
+</script>
+</body>
+</html>
